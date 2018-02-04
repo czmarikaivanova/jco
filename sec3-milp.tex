@@ -24,11 +24,11 @@ $y_{ij}=
 \newline\newline
 $X^{s}_{ij}=
 \begin{cases}
-    1 & \text{if arc $(i,j) \in A$ is used to transmit a message from $s\in D$},\\
+    1 & \text{if arc $(i,j) \in A$ is on a path from $s\in D$},\\
     0 & \text{otherwise}.
   \end{cases}$
 \newline\newline
-The following constraints imply that $G_z$ is a Steiner tree spanning $D$.
+The following constraints imply that $G_y$ is a Steiner tree spanning $D$.
 The minimum Steiner tree is formulated as
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                     % 
@@ -48,14 +48,14 @@ The minimum Steiner tree is formulated as
 \end{subequations}
 
 Let $(X,y)$ be an optimal solution to X0.
-Then, $X^s\in \{0,1\}^{A}$ induces a broadcast Steiner arborescence rooted at source $s\in D$.
-From $y\in \{0,1\}^E$ we obtain the corresponding (undirected) broadcast Steiner tree modeled by (\ref{con:dd:arrowFromDest})-(\ref{con:dd:startInSource}).
-Constraint (\ref{con:dd:arrowFromDest}) ensures that a message from source $s$ reaches a destination $i$ from exactly one neighbour $j\in V_i$.
+Then for each $s\in D$, $X^s\in \{0,1\}^{A}$ induces a Steiner arborescence $G_{X^s}$ rooted at source $s$.
+From $y\in \{0,1\}^E$ we obtain the resulting (undirected) Steiner tree $G_{y}$ modeled by (\ref{con:dd:arrowFromDest})-(\ref{con:dd:startInSource}).
+Constraint (\ref{con:dd:arrowFromDest}) ensures that there is exactly one predecessor $j\in V$ of a destination $i\in D$ in $G_{X^s}$.
 Analogously, (\ref{con:dd:arrowFromNonDestB}) covers the case when $i \in V\setminus D$: for every source $s$, there is at most one inbound arc to a non-destination $i$.
-If a non-destination $i$ forwards a message from $s$ towards $j$, it receives the same message from a neighbour $k$ different from $j$.
+If there is an arc $(i,j)$ in $G_{X^s}$ for a non-destination $i$, there must also be an arc $(k,i)$ such that $k\neq j$.
 This is enforced by (\ref{con:dd:arrowFromNonDestA}).
-Expression (\ref{con:dd:oneDir}) ensures that an edge $\{i,j\}$ is part of a solution if and only if for every $s\in D$, either $(i,j)$ or $(j,i)$ is an arc used for sending a message from $s$.
-The next constraint (\ref{con:dd:startInSource}) expresses that a transmission initiated by $s\in D$ cannot reach $s$ again, which implies non-existence of a directed cycle containing $s$.
+Expression (\ref{con:dd:oneDir}) ensures that an edge $\{i,j\}$ is part of the resulting Steiner tree $G_{y}$ if and only if for every $s\in D$, either $(i,j)$ or $(j,i)$ is in $G_{X^s}$.
+The next constraint (\ref{con:dd:startInSource}) expresses that $s$ does not have any inbound arc in $G_{X^s}$, which implies non-existence of a directed cycle containing $s$.
 %Note that assuming there is no outgoing arc from a non-destination $j$, (\ref{con:dd:arrowFromNonDestA}) does not prevent $j$ from being a leaf in $G_{\mathbf{X^s}}$.
 %Even though such solutions do not change the objective value of an integral solution, a Steiner tree by definition does not contain Steiner leaves.
 %We therefore disallow them by adding constraint (\ref{con:dd:extraCon}) reducing the set of feasible solutions.
@@ -64,7 +64,9 @@ Conversely, for any Steiner tree $T$ spanning $D$, there exists a pair $(X,y)$ s
 
 \subsubsection{SMT model [X1]}
 
-Consider variables
+A Steiner arborescence for $G_{X^s}$ can be regarded as a broadcast arborescence describing how a signal initiated in $s$ is routed towards remaining destinations. 
+Then, it can also be understood that $X_{ij}^s=1$ if and only if arc $(i,j)$ is used to transmit a signal from $s\in D$.
+With this notion, consider variables
 \newline\newline
 $\pi^s_{ij}=
 \begin{cases}
@@ -121,23 +123,20 @@ Index $s$ is excluded from the summation set on the left of (\ref{con:vi:sumYImp
 \subsubsection{Point to point extension [X3]}
 \label{sec:smtx2}
 
-This section shows how to use variables representing point to point message routing in order to strengthen model X2.
+This section introduces variables describing an arc on a path between two destinations, and shows how additional constraints can strengthen model X2.
 
-Consider that a message must be sent from $s\in D$ to $t\in D$.
+Consider a directed path from $s\in D$ to $t\in D$.
 For this purpose, let $S=\{(s,t)\in D\times D, s\neq t\}$ be the set of ordered pairs of distinct destinations.
 In order to model the connectivity requirements, we introduce variables
 \newline\newline
 $x_{ij}^{st}=
 \begin{cases}
-    1 & \text{if arc $(i,j) \in A$ relays a message from $s$ to $t$, $(s,t)\in S$},\\
+    1 & \text{if arc $(i,j) \in A$ lies on a path from $s$ to $t$, $(s,t)\in S$},\\
     0 & \text{otherwise}.
 \end{cases}$
 \newline\newline
-%
-The relation between the $x$-variables in X2 and the $f$-variables is easy to see.
-If arc $(i,j)$ carries signal from $s$ to $t$, then $(i,j)$ is used for transmitting a signal initiated by $s$.
 
-Model X2 can be strengthened by flow conservation constraints for each $(s,t)$-pair, which gives 
+Model X2 can be strengthened by constraints concerning the newly introduced variables, which yields model X3: 
 \newline
 \newline
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -154,8 +153,8 @@ Model X2 can be strengthened by flow conservation constraints for each $(s,t)$-p
 \label{con:mf:flowNormal} \sum\limits_{\substack{ j\in V_i}}x^{st}_{ij}-\sum\limits_{\substack{j\in V_i }}x^{st}_{ji} & = 0 & (s,t)\in S, i\in V\setminus\{s,t\},\\
 %\label{con:mf:flowDest} \sum\limits_{\substack{ j\in V_t }}x^{st}_{tj}-\sum\limits_{\substack{j\in V_t}}x^{st}_{jt}    & = -1  & (s,t)\in S,\\
 \label{con:mf:flowDest} \sum\limits_{\substack{j\in V_t}}x^{st}_{jt}    & = 1  & (s,t)\in S,\\
-\label{con:mf:fcap} x^{st}_{ij} &\leq X^{s}_{ij},& (i,j)\in A, (s,t)\in S,\\
-\label{con:mf:fsym} x^{st}_{ij} &=  x^{ts}_{ji},& (i,j)\in A, (s,t)\in S,\\ 
+\label{con:mf:fcap} x^{st}_{ij} &\leq X^{s}_{ij}& (i,j)\in A, (s,t)\in S,\\
+\label{con:mf:fsym} x^{st}_{ij} &=  x^{ts}_{ji}& (i,j)\in A, (s,t)\in S,\\ 
 %\label{con:vi:f2dest}  x^{st_1}_{ij}-x^{st_2}_{ij}+x^{t_1t_2}_{ij} & \geq 0 & (i,j) \in A,\\
 %\notag && (s,t_1),(s,t_2),(t_1,t_2)\in S,\\
 %\label{con:vi:xImpSumF} X^{s}_{ij} & \leq \sum\limits_{t\in D_s}  x^{st}_{ij} & (i,j)\in A, s\in D, \\
@@ -164,14 +163,14 @@ Model X2 can be strengthened by flow conservation constraints for each $(s,t)$-p
 \end{align}~
 \end{subequations}
 
-The flow conservation constraints (\ref{con:mf:flowNormal})-(\ref{con:mf:flowDest}) guarantee that for each $(s,t)\in S$, one unit of message $(s,t)$ is sent from $s$ to $t$.
-Next, constraint (\ref{con:mf:fcap}) expresses that if an arc $(i,j)$ carries a message $(s,t)$, then this arc is used for sending a message initiated in $s$.
-The flow symmetry (\ref{con:mf:fsym}) states that arc $(i,j)$ carries the message from $s$ to $t$ if and only if arc $(j,i)$ carries message from $t$ to $s$.
+The flow conservation constraints (\ref{con:mf:flowNormal})-(\ref{con:mf:flowDest}) guarantee that for each $(s,t)\in S$, there exists a directed path from $s$ to $t$.
+Next, constraint (\ref{con:mf:fcap}) expresses the obvious relation between $X$ and $x$, that if an arc $(i,j)$ lies on a path from $s$ to $t$, then this arc is also on a path from $s$.
+The flow symmetry (\ref{con:mf:fsym}) states that arc $(i,j)$ lies on a path from $s$ to $t$ if and only if arc $(j,i)$ lies on a path from $t$ to $s$.
 
-The new variables introduced in this section suggest strengthening X2 by more valid inequalities involving these variables.
+In terms of broadcast trees, we can say that $x_{ij}^{st}=1$ if and only if $(i,j)$ carries a signal initiated in $s$ and directed to $t$.
 Consider nodes $i,j\in V$ and a pair of destinations $(s,t)$.
 If a message from $s$ to $t$ is sent through $(j,k)$ such that $p_{jk}\geq p_{ji}$, then the message from $s$ must be relayed by $j$ using power level at least $p_{ji}$.
-This is expressed by (\ref{con:vi:sumFImpSumY}).
+This is expressed by valid inequality (\ref{con:vi:sumFImpSumY}).
 
 \subsection{Formulation based on network flows}
 
