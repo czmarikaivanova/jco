@@ -1,0 +1,73 @@
+\section{Introduction}
+\label{intro}
+
+The purpose of a multicast communication in a wireless ad-hoc network is to route information from a sending device to a set of receiving devices.
+Given a set of wireless devices and distances between them, the task is to assign power to each device, so that the demands of the communication are met and the energy consumption is as low as possible, assuming their locations are fixed.
+Power efficiency is an important measure in designing ad-hoc wireless networks since the devices typically use batteries as power supply and are therefore heavily energy-constrained.
+Individual devices work as transceivers, which means that they have the ability to both transmit and receive a signal.
+Moreover, the power level of a device can be dynamically adjusted during a multicast session.
+
+Unlike wired networks, where signal passing takes place along pre-defined links, nodes in ad-hoc wireless networks use omnidirectional antennas, and hence a message reaches all nodes within the communication range of its sender.
+This range is determined by the power assigned to the sender, which is the maximum rather than the sum of the powers necessary to reach all intended receivers.
+This feature is often referred to as \emph{wireless advantage} \cite{Wieseltier00onthe}.
+
+A well known and extensively studied task in wireless network design is the Minimum Energy Broadcast (MEB) problem.
+Given a set of wireless devices with one designated source node among them, the goal is to assign powers to individual nodes  which determines their communication ranges, inducing a broadcast tree such that a signal initiated by the source reaches all the remaining nodes, and the energy consumption for this communication is minimized.
+Typically, not only one node can act as a source.
+Every node may initiate a message intended for the remaining nodes.
+In general, two different sources have two different optimal broadcast trees, which means that the optimal broadcast trees must be calculated separately for every possible source node.
+Furthermore, in order to route signals correctly, the nodes must be able to recognize which node initiated currently received signal and therefore which broadcast tree is used, or from the relaying device's perspective, which power level should be set.
+It is obvious that such overhead calculations require additional energy and certain abilities of used devices.
+
+The idea of the SBT problem is to maintain a single broadcast tree regardless the source of a signal.
+Such a tree would not be optimal for individual sources, but routing at each node would be considerably simplified.
+Provided that a single broadcast tree is used, the nodes are no longer required to identify the source of the message in order to set a correct power level.
+Instead, only the immediate neighbour from which the signal was received must be recognized.
+The objective function in SBT captures not only the power levels of the nodes, but depends also on how often a node actually transmits using certain power level.
+A natural extension of this concept and a forefront of this paper is the Shared Multicast Tree (SMT) problem, in which some of the nodes never initiate any transmission and do not have to receive any signals.
+They are called \emph{non-destinations}, and can be used as intermediate forwarding nodes whenever it reduces the resulting power, and thus play the role of Steiner nodes.
+Devices that can initiate a transmission and also have to receive every message are referred to as \emph{destinations}.
+
+\subsection{Applications}
+
+Wireless ad hoc networks are suitable in various practical applications in both civil and military sector, where a communication infrastructure is either absent or cannot be relied on.
+Owing to their quick deployment and simple configuration, wireless ad hoc networks are useful in emergency operations such as natural disaster relief and military command and control.
+Recently, the concepts of ad hoc wireless networks has been introduced in ad hoc smart lighting in homes and in offices as well as ad hoc street light networks, where the control includes adjusting dimmable lights.
+ 
+\subsection{Related work}
+
+Another cathegory of relevant research are works concerning a variety of integer linear programming (ILP) formulations of the Steiner problem in graphs; e.g. \cite{goemans93catalog}, \cite{Polzin} or \cite{diane93ipf}. 
+
+\subsection{Assumptions and notation}
+
+An ad-hoc wireless network is modeled by a complete graph $G=(V,E)$, where the set $V$ of nodes represents the set of wireless devices and the set of edges $E=\{\{i,j\}:i,j\in V, i\neq j\}$ corresponds to the potential links between them.
+Often we use the set $A=\{(i,j):i,j\in V,\{i,j\}\in E\}$ that contains all arcs derived from $E$.
+The set $D\subseteq V$ of \emph{destinations} denotes selected devices that initiate a communication and also are required to receive every message initiated by some other destination.
+The remaining devices represented by $V\setminus D$ do not have to receive the messages, but can be used as intermediate nodes relaying a transmission.
+For an arbitrary $i\in V$, sets $V\setminus \{i\}$ and $D\setminus\{i\}$ are abbreviated as $V_i$ and $D_i$, respectively.
+ 
+Next, $d: V\times V\rightarrow \mathbb{R}$ is a function that determines a distance between every two nodes.
+The constant $\alpha$ represents an environmentally dependent parameter typically valued between 2 and 4.
+Power requirement $p_{ij}$ for sending a message from node $i$ to node $j$ is then calculated as $p_{ij}=d^{\alpha}_{ij}$, implying the symmetry $p_{ij}=p_{ji}$.
+The task is to find a Steiner tree minimizing the objective function clarified in the next section.
+
+If $\{i,j\}$ is an edge in a tree $T=(V_T,E_T)$ in $G$, we use $T_{i/j}$ to denote the subtree of $T$ consisting of all vertices $k$ such that the path from $k$ to $j$ visits $i$, as introduced in \cite{Haugland12Dual}.
+Additionally, we define a function $\text{nod}(T_{i/j})$ that returns the number of destinations in $T_{i/j}$.
+Neighbours of $i$ in $T$ are denoted $i^T_1$, $i^T_2$, $i^T_3, \dots$ in non-increasing order of distance from $i$.
+If there is no risk of confusion, we omit the superscript $T$.
+The highest and second highest power levels of $i$ are defined by its neighbours $i_1$ and $i_2$, respectively.
+For a leaf $i$ of $T$, we define $p_{ii_2}=0$.
+
+Let $z \in \{0,1\}^E$ be a binary vector with components corresponding to edges in $E$.
+Then undirected graph induced by $z$ is defined as  $G_z=(V,E_z)$, where $\{i,j\}\in E_z\Leftrightarrow z_{ij}=1$.
+Directed graph induced by $x \in \{0,1\}^A$ is defined analogously.
+In both cases, the induced (directed) graph is not necessarily connected.
+Vector $f^s=(f^s_{ij})_{(i,j)\in A}$ for some $s\in D$ is often used in discussions of IP models.
+A continuous relaxation of an IP model M is denoted as LP(M).
+
+The remainder of this paper is organized as follows: Section \ref{sec:SBT} describes the SMT problem and gives detailed explanation of its objective function.
+Integer linear programming formulations, valid inequalities and their analysis are presented in Section \ref{sec:ILP}, followed by Section \ref{sec:comp} that compares the studied models.
+Section \ref{sec:cg} describes a constraint generation procedure used for experimental evaluation with results reported in Section \ref{sec:exp}.
+Future work and concluding remarks are summarized in Section \ref{sec:conclusion}.
+
+

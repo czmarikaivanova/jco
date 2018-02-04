@@ -1,0 +1,314 @@
+%%%%%%%%%%%%%%%%%%%%%%% file template.tex %%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This is a general template file for the LaTeX package SVJour3
+% for Springer journals.          Springer Heidelberg 2010/09/16
+%
+% Copy it to a new file with a new name and use it as the basis
+% for your article. Delete % signs as needed.
+%
+% This template includes a few options for different layouts and
+% content for various journals. Please consult a previous issue of
+% your journal as needed.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\RequirePackage{fix-cm}
+%
+%\documentclass{svjour3}                     % onecolumn (standard format)
+%\documentclass[smallcondensed]{svjour3}     % onecolumn (ditto)
+\documentclass[smallextended]{svjour3}       % onecolumn (second format)
+%\documentclass[twocolumn]{svjour3}          % twocolumn
+%
+\smartqed  % flush right qed marks, e.g. at end of proof
+%
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{subcaption}
+\usepackage{hyperref}
+%\usepackage{pdflscape} % Landscape pages
+\usepackage{color}	% Different font colors
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage[]{algorithm2e}
+\usepackage{color}
+\usepackage{multirow} % Merging rows in tables
+\usepackage{multicol} % Merging columns in tables
+\usepackage{booktabs} % Horizontal rules in tables
+
+\newcommand{\indentitem}{\setlength\itemindent{18pt}}
+\renewcommand{\labelitemi}{$\bullet$}
+\captionsetup{compatibility=false}
+\newtheorem{prop}{Proposition}
+\newtheorem{obs}{Observation}
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+\SetKwRepeat{Do}{do}{while}
+%
+% \usepackage{mathptmx}      % use Times fonts if available on your TeX system
+%
+% insert here the call for the packages your document requires
+%\usepackage{latexsym}
+% etc.
+%
+% please place your own definitions here and don't use \def but
+% \newcommand{}{} 
+%
+% Insert the name of "your journal" with
+% \journalname{myjournal}
+%
+% original amsmath definition
+% \subequations:
+% \long macro:->\refstepcounter {equation}\protected@edef \theparentequation {\theequation }\setcounter {parentequation}{\value {equation}}\setcounter {equation}{0}\def \theequation {\theparentequation \alph {equation}}\ignorespaces 
+
+% saved by hyperref in
+% > \HyOrg@subequations=\long macro:
+
+% hyperref-patched \subequations: (\endsubequations not modified)
+% > \subequations=macro:
+% ->\stepcounter {equation}\protected@edef \theHparentequation {\@ifundefined {th
+% eHequation}\theequation \theHequation }\addtocounter {equation}{-1}\HyOrg@subeq
+% uations \def \theHequation {\theHparentequation \alph {equation}}\ignorespaces 
+% .
+
+
+% extending the environment
+%   1. with optional parameter: expected values resume or intermezzo or none.
+%   2. while keeping the hyperref customization.
+
+\makeatletter
+\def\user@resume{resume}
+\def\user@intermezzo{intermezzo}
+%
+\newcounter{previousequation}
+\newcounter{lastsubequation}
+\newcounter{savedparentequation}
+\setcounter{savedparentequation}{1}
+% 
+% The following code causes that we are able to continue with numbering of a model in a next \align .
+% For example:
+%    a < b    (1a)
+%    a < c    (1b)
+% some text comes here and the numbering will continue:
+%    a < d    (1c)
+%
+\renewenvironment{subequations}[1][]{%
+      \def\user@decides{#1}%
+      \setcounter{previousequation}{\value{equation}}%
+      \ifx\user@decides\user@resume 
+           \setcounter{equation}{\value{savedparentequation}}%
+      \else  
+      \ifx\user@decides\user@intermezzo
+           \refstepcounter{equation}%
+      \else
+           \setcounter{lastsubequation}{0}%
+           \refstepcounter{equation}%
+      \fi\fi
+      \protected@edef\theHparentequation{%
+          \@ifundefined {theHequation}\theequation \theHequation}%
+      \protected@edef\theparentequation{\theequation}%
+      \setcounter{parentequation}{\value{equation}}%
+      \ifx\user@decides\user@resume 
+           \setcounter{equation}{\value{lastsubequation}}%
+         \else
+           \setcounter{equation}{0}%
+      \fi
+      \def\theequation  {\theparentequation  \alph{equation}}%
+      \def\theHequation {\theHparentequation \alph{equation}}%
+      \ignorespaces
+}{%
+%  \arabic{equation};\arabic{savedparentequation};\arabic{lastsubequation}
+  \ifx\user@decides\user@resume
+       \setcounter{lastsubequation}{\value{equation}}%
+       \setcounter{equation}{\value{previousequation}}%
+  \else
+  \ifx\user@decides\user@intermezzo
+       \setcounter{equation}{\value{parentequation}}%
+  \else
+       \setcounter{lastsubequation}{\value{equation}}%
+       \setcounter{savedparentequation}{\value{parentequation}}%
+       \setcounter{equation}{\value{parentequation}}%
+  \fi\fi
+%  \arabic{equation};\arabic{savedparentequation};\arabic{lastsubequation}
+  \ignorespacesafterend
+}
+\makeatother
+
+\begin{document}
+
+\title{Comparison of Mixed Integer Programming Formulations for the Shared Multicast Tree Problem
+%\thanks{Grants or other notes
+%about the article that should go on the front page should be
+%placed here. General acknowledgments should be placed at the end of the article.}
+}
+\subtitle{Tightening the LP bounds}
+\titlerunning{Comparison of MIP formulations for SMT}        % if too long for running head
+
+\author{Marika Ivanova        \and
+         Dag Haugland
+}
+%\authorrunning{Short form of author list} % if too long for running head
+
+\institute{F. Author \at
+              first address \\
+              Tel.: +123-45-678910\\
+              Fax: +123-45-678910\\
+              \email{fauthor@example.com}           %  \\
+%             \emph{Present address:} of F. Author  %  if needed
+           \and
+           S. Author \at
+              second address
+}
+
+\date{Received: date / Accepted: date}
+% The correct dates will be entered by the editor
+\maketitle
+
+\begin{abstract}
+In this paper we focus on the Shared Multicast Tree problem (SMT), which is 
+a task in wireless network design aiming to establish a wireless 
+communication network minimizing necessary energy consumption. SMT is a 
+generalization of the Shared Broadcast Tree problem (SBT), and can be 
+regarded as a Steiner tree problem with a nonlinear objective functinon that
+reflects the use in wireless communication. In particular, we consider two 
+integer linear programming formulations and investigate how they relate to 
+each other.  Both models are subsequently extended by additional variables and corresponding constraints. We also present several valid inequalities. Our goal is to achieve a stronger LP bound than models studied in previous works, and also to devise 
+a method which allows computing these lower bounds for instances as 
+large as possible. Numerical experiments suggest that both models are much 
+stronger than previous formulations, however, the number of constraints 
+makes them impractical for solving instances of even fairly small size as 
+the computation takes prohibitively long time. Applying a constraint 
+generation scheme on one of the studied models substantially increases the 
+size of the instances for which it is possible to obtain a strong LP 
+bound. 
+\keywords{Wireless communication, broadcast tree, multicast, Steiner tree, LP bound, 
+valid inequalities}
+% \PACS{PACS code1 \and PACS code2 \and more}
+% \subclass{MSC code1 \and MSC code2 \and more}
+\end{abstract}
+
+\input{sec1-intro.tex}
+\input{sec2-sbtsmt.tex}
+\input{sec3-milp.tex}
+\input{sec4-relations.tex}
+\input{sec5-cg.tex}
+\input{sec6-exp.tex}
+\input{sec7-conclusion.tex}
+
+%as required. Don't forget to give each section
+%and subsection a unique label (see Sect.~\ref{sec:1}).
+%\paragraph{Paragraph headings} Use paragraph headings as needed.
+%\begin{equation}
+%a^2+b^2=c^2
+%\end{equation}
+
+% For one-column wide figures use
+%\begin{figure}
+% Use the relevant command to insert your figure file.
+% For example, with the graphicx package use
+%  \includegraphics{example.eps}
+% figure caption is below the figure
+%\caption{Please write your figure caption here}
+%\label{fig:1}       % Give a unique label
+%\end{figure}
+%
+% For two-column wide figures use
+%\begin{figure*}
+% Use the relevant command to insert your figure file.
+% For example, with the graphicx package use
+%  \includegraphics[width=0.75\textwidth]{example.eps}
+% figure caption is below the figure
+%\caption{Please write your figure caption here}
+%\label{fig:2}       % Give a unique label
+%\end{figure*}
+%
+% For tables use
+%\begin{table}
+% table caption is above the table
+%\caption{Please write your table caption here}
+%\label{tab:1}       % Give a unique label
+% For LaTeX tables use
+%\begin{tabular}{lll}
+%\hline\noalign{\smallskip}
+%first & second & third  \\
+%\noalign{\smallskip}\hline\noalign{\smallskip}
+%number & number & number \\
+%number & number & number \\
+%\noalign{\smallskip}\hline
+%\end{tabular}
+%\end{table}
+
+
+%\begin{acknowledgements}
+%If you'd like to thank anyone, place your comments here
+%and remove the percent signs.
+%\end{acknowledgements}
+
+% BibTeX users please use one of
+%\bibliographystyle{spbasic}      % basic style, author-year citations
+%\bibliographystyle{spmpsci}      % mathematics and physical sciences
+%\bibliographystyle{spphys}       % APS-like style for physics
+%\bibliography{}   % name your BibTeX data base
+
+% Non-BibTeX users please use
+\begin{thebibliography}{}
+
+%
+% and use \bibitem to create references. Consult the Instructions
+% for authors for reference list style.
+%
+\bibitem{Wieseltier00onthe}
+Wieselthier,  J. E., Nguyen, G. D., Ephremides, A.,
+On the Construction of Energy-Efficient Broadcast and Multicast Trees in Wireless Networks,
+Proceedings of the Nineteenth Annual Joint Conference of the IEEE Computer and Communications Societies.
+2, 585--594 (2000)
+
+\bibitem{Haugland12Dual}
+Yuan, D., Haugland, D.,
+Dual Decomposition for Computational Optimization of Minimum-Power Shared Broadcast Tree in Wireless Networks,
+IEEE Transactions on Mobile Computing,
+12, 11, 2008--2019 (2012)
+
+\bibitem{Polzin}
+Polzin, T., Daneshmand, S. V., A comparison of Steiner tree relaxations, Discrete Applied Mathematics, 112,  1-3, 15 241--261, (2001)
+
+\bibitem{ivanova16isco}
+Ivanova, M., Shared Multicast Trees in Ad Hoc Wireless Networks, Combinatorial Optimization, 4th International Symposium, ISCO 2016, 241--261, (2016)
+
+\bibitem{Haugland11Compact}
+Haugland, D., Yuan, D.,
+Wireless Network Design: Optimization Models and Solution Procedure, 219--246,
+International Series in Operations Research \& Management Science.
+Springer, New York, (2011)
+
+\bibitem{Papadimitriou06SBT}
+Papadimitriou, I., and Georgiadis, L.:
+Minimum-energy Broadcasting in Multi-hop Wireless Networks Using a Single Broadcast Tree.
+Mobile Networks and Applications.
+11, 3, 361--375 (2006)
+
+\bibitem{goemans93catalog}
+Goemans, M. X., Myung, Y-S.,
+A catalog of steiner tree formulations, 
+Networks.
+23, 1, 19--28 (1993) 
+
+\bibitem{diane93ipf}
+Dian{\'e}, M., Plesn{\'i}k, J.,
+An integer programming formulation of the Steiner problem in graphs,
+Zeitschrift f{\"u}r Operations Research.
+37, 1, 107--111 (1993)
+
+%\bibitem{RefJ}
+% Format for Journal Reference
+%Author, Article title, Journal, Volume, page numbers (year)
+% Format for books
+%\bibitem{RefB}
+%Author, Book title, page numbers. Publisher, place (year)
+% etc
+\end{thebibliography}
+
+\end{document}
+% end of file template.tex
+
