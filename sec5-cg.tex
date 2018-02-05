@@ -1,6 +1,6 @@
 \section{Constraint Generation Scheme}
 \label{sec:cg}
-Owing to the large number of constraints in the stronger models, LP(X2VI) and LP(F2VI) are impractical for computing lower bounds, even in fairly small instances.
+Owing to the large number of constraints in the stronger models, LP($\mathcal{X}_3$) and LP($\mathcal{F}_3$) are impractical for computing lower bounds, even in fairly small instances.
 The main idea of how to tackle larger instances and thereby make these models more useful in practice is to solve a relaxation of the model where some of the constraints are omitted.
 It is assumed that the omitted constraints are often satisfied in solution of the relaxed problem, without being explicitly included in the model.
 Relaxed constraints that are violated in the obtained solutions can be dynamically added to the model and the whole process is repeated, until some termination criteria are fulfilled.
@@ -8,14 +8,14 @@ This approach is known as a \emph{constraint generation scheme}.
 
 \subsection{Implementation}%
 
-Experimental evaluation from the next section reveals that the valid inequality (\ref{con:vi:sumFImpSumY}) makes X2VI very strong, in fact its LP relaxation often gives an integral solution.
-To the contrary, the other valid inequalities (\ref{con:vi:f2dest}) and (\ref{con:vi:xImpSumF}) rarely improve the LP bounds, and moreover increase the runtime.
+%Experimental evaluation from the next section reveals that the valid inequality (\ref{con:vi:sumFImpSumY}) makes $\mathcal{X}_3$ very strong, in fact its LP relaxation often gives an integral solution.
+%To the contrary, the other valid inequalities (\ref{con:vi:f2dest}) and (\ref{con:vi:xImpSumF}) rarely improve the LP bounds, and moreover increase the runtime.
 For these practical reasons, we consider the model X2+(\ref{con:vi:sumFImpSumY}) for constraint generation.
-Also note that LP(X1) has the shortest runtime but not much shorter than LP(X1VI).
-The idea is therefore to solve LP(X1VI) and generate only those remaining constraints that are violated.
+Also note that LP($\mathcal{X}_1$) has the shortest runtime but not much shorter than LP($\mathcal{X}_2$).
+The idea is therefore to solve LP($\mathcal{X}_2$) and generate only those remaining constraints that are violated.
 
 For each $(s,t)\in S$, constraints (\ref{con:mf:flowNormal})-(\ref{con:mf:fcap})form a classical maximum flow formulation which can be solved very quickly.
-Observe that according to (\ref{con:mf:fcap}), $x^s$ plays the role of a capacitiy vector in the network $G_{x^s}=(V,E,s,t,x^s)$ in which we want to find the maximum flow, and thereby verify whether the flow conservation constraints are already satisfied even though they are not explicitly included in the model.
+Observe that according to (\ref{con:mf:fcap}), $x^s$ plays the role of a capacity vector in the network $G_{x^s}=(V,E,s,t,x^s)$ in which we want to find the maximum flow, and thereby verify whether the flow conservation constraints are already satisfied even though they are not explicitly included in the model.
 The formulation can also be extended by (\ref{con:vi:sumFImpSumY}).
 Unfortunately, including (\ref{con:mf:fsym}) is slightly problematic here, because it contains variables of a different commodity, namely $(t,s)$.
 It is not possible to simply extend the model by these constraints, because a potential violation of flow conservation for the commodity $(t,s)$ would not be discovered, as there are no corresponding capacity constraints.
@@ -36,22 +36,22 @@ This extended maximum flow formulation denoted as 2MF is constructed as follows:
 \label{objective:maxf} &\max\sum\limits_{i \in V_s} f_{si} \\ 
 \text{s.t.}  \notag   \\
 \label{con:maxf:flowNormal}  \sum\limits_{\substack{ j\in V_i}}\left(f_{ij}-f_{ji}\right) & = 0 & i\in V\setminus\{s,t\},\\
-\label{con:maxf:fcapst}   f_{ij} &\leq \min\{x_{ij}^s, x_{ji}^t\}     &  (i,j)\in A,  \\ 	 
-\label{con:maxf:sumFImpSumYst} \sum\limits_{k\in V_i:p_{ik}\geq p_{ij}}f_{ik} & \leq \sum\limits_{k\in V_i:p_{ik}\geq p_{ij}}  y^{s}_{ik} & i,j\in V,\\
-\label{con:maxf:sumFImpSumYts} \sum\limits_{k\in V_i:p_{ik}\geq p_{ij}}f_{ki} & \leq \sum\limits_{k\in V_i:p_{ik}\geq p_{ij}}  y^{t}_{ik} &  i,j\in V,\\
+\label{con:maxf:fcapst}   f_{ij} &\leq \min\{X_{ij}^s, X_{ji}^t\}     &  (i,j)\in A,  \\ 	 
+\label{con:maxf:sumFImpSumYst} \sum\limits_{k\in V_i:p_{ik}\geq p_{ij}}f_{ik} & \leq \sum\limits_{k\in V_i:p_{ik}\geq p_{ij}}  \pi^{s}_{ik} & i,j\in V,\\
+\label{con:maxf:sumFImpSumYts} \sum\limits_{k\in V_i:p_{ik}\geq p_{ij}}f_{ki} & \leq \sum\limits_{k\in V_i:p_{ik}\geq p_{ij}}  \pi^{t}_{ik} &  i,j\in V,\\
 \label{con:maxf:fdim}f&\in\left[0,1\right]^{A}. 
 \end{align}~
 \end{subequations}  
   
-This model comprises of constraints for $\{s,t\}\in\check{S}$ that are in X2+(\ref{con:vi:sumFImpSumY}) but not in X1VI.
+This model comprises of constraints for $\{s,t\}\in\check{S}$ that are in $\mathcal{X}_3$ but not in $\mathcal{X}_2$.
 Note that the right-hand sides in (\ref{con:maxf:fcapst})-(\ref{con:maxf:sumFImpSumYts}) are not variables.
-These values are input data obtained by solving LP(X1VI).
+These values are input data obtained by solving LP($\mathcal{X}_2$).
 The problem modelled by this formulation can be understood as a maximum 2-commodity network flow, where the source of the first commodity is the target of the second commodity and vice versa.
 Furthermore, the arcs have different capacities for the two commodities, even though it is required that the amount of one commodity passing through an arc $(i,j)$ equals the amount of the other commodity passing through $(j,i)$.
 Due to the flow symmetry (\ref{con:mf:fsym}), we can always substitute $f^{ts}_{ji}$ with $f^{st}_{ij}$, and it is done so in (\ref{con:maxf:fcapst}) and (\ref{con:maxf:sumFImpSumYts}).
  
 Based on these observations we build the constraint generation procedure.
-First, we solve LP(X1VI) and obtain vectors $x$ and $y$.
+First, we solve LP($\mathcal{X}_2$) and obtain vectors $x$ and $y$.
 For each $(s,t)\in \check{S}$ we then check whether the relaxed constraints (\ref{con:mf:flowNormal})-(\ref{con:mf:fsym}) together with (\ref{con:vi:sumFImpSumY}) can already be satisfied by solving 2MF.
 In case the objective value is 1, the relaxed constraints are satisfied.
 Otherwise, we record the pair $(s,t)$, and after processing all pairs, relaxed constraints for a selection of the recorded pairs are added to the original model.
@@ -66,12 +66,12 @@ Algorithm \ref{alg:cg} describes the process more formally.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{algorithm}
 \KwData{SMT instance}
-\KwResult{Solution to LP(SMT-X2-VI)}
-$Q'\leftarrow\emptyset$\tcp*{$\{s,t\}$ pairs of which constraints are to be added to SMT-X1-VI}
+\KwResult{Solution to LP($\mathcal{X}_3$)}
+$Q'\leftarrow\emptyset$\tcp*{$\{s,t\}$ pairs of which constraints are to be added to $\mathcal{X}_2$}
 \Do {$Q'\neq\emptyset$}{
 	$Q\leftarrow\emptyset$\tcp*{Violated $\{s,t\}$ pairs} 
-	\tcc{Solve the instance using SMT-X1-VI extended by constraints from 2MF associated with $\{s,t\}$ pairs in $Q'$}
-	$(x,y)\leftarrow\text{solve(SMT-X1-VI,$Q'$.)}$\;
+	\tcc{Solve the instance using $\mathcal{X}_2$ extended by constraints from 2MF associated with $\{s,t\}$ pairs in $Q'$}
+	$(x,y)\leftarrow\text{solve($\mathcal{X}_2$,$Q'$.)}$\;
 	\For{$\{s,t\}\in \check{S}$} {
 		\tcc{Find the objective value of the extended maximum flow problem instance for given commodity $(s,t)$ using the capacities obtained earlier.}
 		$v^*\leftarrow \text{solve(2MF,$s$,$t$,$x$,$y$)}$\;
