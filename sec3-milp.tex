@@ -12,7 +12,7 @@ Valid inequalities added to the extended models result in the strongest known SM
 
 The first model extends the SBT formulation introduced in \cite{Haugland12Dual} by the Steiner nodes in order to formulate the multicast version of the problem \cite{ivanova16isco}.
 
-\subsubsection{Underlying minimum Steiner tree formulation}
+\subsubsection{Underlying Steiner tree formulation [X0]}
 
 Following \cite{Haugland12Dual}, define the binary variables
 \newline\newline
@@ -145,9 +145,9 @@ Model X2 can be strengthened by constraints concerning the newly introduced vari
 %   (1a) - (1k) and (2b) - (2f)       %
 %                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{subequations}\label{eq:smt-x2}
+\begin{subequations}[resume]\label{eq:smt-x2}
 \begin{align}
-\label{objective:mf} \makebox[0pt][l]{$\displaystyle{} \min \sum\limits_{(i,j) \in A} \sum\limits_{s \in D} p_{ij} \pi^s_{ij} $}\\
+\notag\makebox[0pt][l]{$\displaystyle{} \min \sum\limits_{(i,j) \in A} \sum\limits_{s \in D} p_{ij} \pi^s_{ij} $}\\
 \text{s.t.} \notag \\
 (\ref{con:dd:arrowFromDest}) - (\ref{con:dd:vardim}) &\text{ and }(\ref{con:dd:yvar}) - (\ref{con:vi:sumYImpSumX}) \notag\\
 \label{con:mf:flowNormal} \sum\limits_{\substack{ j\in V_i}}x^{st}_{ij}-\sum\limits_{\substack{j\in V_i }}x^{st}_{ji} & = 0 & (s,t)\in S, i\in V\setminus\{s,t\},\\
@@ -179,14 +179,14 @@ We consider the multi-commodity network flow based model studied in \cite{Polzin
 The model assumes a given destination $s_0\in D$ that plays the role of a unique source.
 To simplify the notation, let $D_0= D_{s_0}$.
 
-\subsubsection{Underlying minimum Steiner tree formulation [F0]}
+\subsubsection{Underlying Steiner tree formulation [F0]}
 
-Model F0 for the Steiner tree contains variables
+The model F0 of a Steiner tree contains variables
 %
 \newline\newline
   $F^{t}_{ij}=
 \begin{cases}
-    1 & \text{if arc $(i,j) \in A$ carries flow from $s_0$ to $t\in D_0$},\\
+    1 & \text{if arc $(i,j) \in A$ lies on a path from $s_0$ to $t\in D_0$},\\
     0 & \text{otherwise},
 \end{cases}$
 \newline\newline
@@ -263,7 +263,7 @@ The model F1 for Problem \ref{def:problem} based on the minimum Steiner arboresc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{subequations}[resume]
 \begin{align}
-\min & \sum\limits_{(i,j) \in A} \sum\limits_{s \in D} p_{ij} \pi^s_{ij}\\ 
+\notag\min & \sum\limits_{(i,j) \in A} \sum\limits_{s \in D} p_{ij} \pi^s_{ij}\\ 
 \notag\text{s.t.} && \\
 \notag(\ref{con:pf1:xfrel}) - (\ref{con:pf1:dim})\\
 \label{con:pf1:yvar} g_{ij} - F^t_{ij}+F^t_{ji} & \leq \sum\limits_{\substack{k\in V: \\ p_{ik}\geq p_{ij}}}\pi^t_{ik}  & t\in D_0, (i,j)\in A,\\
@@ -276,13 +276,74 @@ The model F1 for Problem \ref{def:problem} based on the minimum Steiner arboresc
 \end{align}~
 \end{subequations}
 
-Constraint (\ref{con:pf1:yvar}) and (\ref{con:pf1:yvar0}) have the same purpose as (\ref{con:dd:yvar}), and are expressed in F1 space. % using transformations (\ref{eq:tr:xijsB}).
+Constraints (\ref{con:pf1:yvar}) and (\ref{con:pf1:yvar0}) have the same purpose as (\ref{con:dd:yvar}), and are expressed in F1 space. % using transformations (\ref{eq:tr:xijsB}).
+Note that the $\pi$-variables determining power levels are defined for all destinations in $D$, while in the model F1 \cite{Polzin} of the minimum Steiner tree problem, the $F$-variables are defined only for destinations in $D_0$.
+For this reason, $\pi_{ij}^0$ is treated separately in (\ref{con:pf1:yvar0}).
+%This inconsistency is resolved by adding (\ref{con:pf1:yvar0}), which relates the $\pi^0$-variables with $x$-variables. This is equivalent to extending the the domain of the $f$-variables and fixing the newly introduced variables to zero. 
+
+By (\ref{con:pf1:B}) we prevent a non-destination from having multiple entering arcs.
+This is not needed in the minimum Steiner tree problem formulation, because the objective function causes that such solutions are filtered out by optimality.
+The necessity of this constraint in SMT is demonstrated in Fig. \ref{fig:BProof}.
+%The optimal solution with objective value 25156 to the depicted instance obtained by solving SMT-X1 is shown in Fig. \ref{fig:BorigSMT}.
+%The solution in Fig \ref{fig:Bpf2} yielded by solving SMT-F1 without the constraint (\ref{con:pf1:B}) has objective value 25148, but is not a feasible solution to Problem \ref{def:problem}, because of the cycle $(g,h,i,d,g)$.
+%The non-existence of such a cycle in a solution given by model X1 is ensured by constraints (\ref{con:dd:arrowFromDest}), (\ref{con:dd:arrowFromNonDestB}) and (\ref{con:dd:oneDir}).
+%A detailed proof of this claim can be found in \cite{ivanova16isco}.
+%A transmission commenced in node $c$ is sent via arc $(g,f)$.
+%As a consequence of the link between $g$ and $d$ in Fig. \ref{fig:Bpf2}, the node $d$ also receives the message.
+%This link is absent in Fig. \ref{fig:BorigSMT}, and so $i$ has to relay the signal using arc $(i,d)$, causing the higher total objective value.
+Similarly, the obviously valid inequalities (\ref{con:pf1:noflowFromT})-(\ref{con:pf1:fitt=xit}) are not necessary in the minimum Steiner tree formulation, but have to be included in the formulation of SMT, because they  disallow nodes in $D_0$ to have multiple entering arcs.
+The same restriction has to be imposed on $s_0$ by including (\ref{con:pf1:xi0=0}).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      Figure 2                                      %
+%    explaining why some constraints are necessary   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[!htb]
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{conBNec}
+        \caption{Optimal solution obtained by X1. The $y$-variables inducing the resulting tree in this model represent undirected edges. The objective value of this tree is 25156.\newline~}
+        \label{fig:BorigSMT}
+    \end{subfigure}
+    \hfill
+% a blank line to force the subfigure onto a new line
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{conBNec2}
+        \caption{Solution obtained by F1 without constraint \ref{con:pf1:B} with objective value 25148 is not a Steiner tree.
+		 The nodes are connected by arrows because the solution is a directed graph with a predefined source $s_0$.}
+        \label{fig:Bpf2}
+    \end{subfigure}
+    \caption{An exemplary instance showing why constraint (\ref{con:pf1:B}) is necessary in F1.
+		Blue numbers denote power requuirements of connection between nodes.
+		For better legibility, the distances of the links are not proportional.} 
+    \label{fig:BProof}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                     %
+%         Proposition 1               %
+%                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{prop}
+\label{prop:modelcorrect}
+If $(F,g)$ satisfies (\ref{con:pf1:xfrel}) - (\ref{con:pf1:dim}) and (\ref{con:pf1:B})-(\ref{con:pf1:xi0=0}) then $G_{g}$ is a Steiner arborescence spanning $D$ rooted at $s_0$.
+\end{prop}
+ 
+\begin{proof}
+The connectivity of $G_{g}$ as well as coverage of all nodes from $D$ is ensured by flow constraints (\ref{con:pf1:flow}) and relation (\ref{con:pf1:xfrel}).
+The absence of both directed and undirected cycles is enforced by (\ref{con:pf1:B})-(\ref{con:pf1:xi0=0}).
+As discussed above, these constraints together imply that no node has more than one entering arc.
+In particular for a destination $i\in D_0$, by utilizing first (\ref{con:pf1:fitt=xit}), next (\ref{con:pf1:flow}) for $t=i$, and finally (\ref{con:pf1:noflowFromT}), we get
+$$\sum_{j\in V_i}g_{ji}=\sum_{j\in V_i}F_{ji}^i = 1+\sum_{j\in V_i}F_{ij}^i=1.$$
+%Solutions, where nodes from $V\setminus D$ are leaves are excluded due to (\ref{con:pf1:flowX}).
+\qed
+\end{proof}
+
 \begin{prop}\label{prop:transX}
 Assume $(F,\pi,g)$ satisfies (\ref{con:pf1:xfrel}) - (\ref{con:pf1:dim}) and  (\ref{con:pf1:B}) - (\ref{con:pf1:dimy}). Then
 $$
 g_{ij} - F^t_{ij}+F^t_{ji} = 
 	\begin{cases}
-		1, ~(i,j)~\text{is an arc on the path from~$t\in D_0$} \\
+		1, ~(i,j)~\text{is an arc on the path from~$t\in D_0$ in $G_{g}$} \\
 		0, ~\text{otherwise.}
 	\end{cases}
 $$
@@ -300,66 +361,9 @@ where the equality follows from (\ref{con:pf1:xfrel}).
 \qed
 \end{proof}
 
-
-Note that the $\pi$-variables determining power levels are defined for all destinations in $D$, while in the model F1 \cite{Polzin} of the minimum Steiner tree problem, the $F$-variables are defined only for destinations in $D_0$.
-For this reason, $\pi_{ij}^0$ is treated separately in (\ref{con:pf1:yvar0}).
-%This inconsistency is resolved by adding (\ref{con:pf1:yvar0}), which relates the $\pi^0$-variables with $x$-variables. This is equivalent to extending the the domain of the $f$-variables and fixing the newly introduced variables to zero. 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%      Figure 2                                      %
-%    explaining why some constraints are necessary   %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{figure}[!htb]
-    \centering
-    \begin{subfigure}[b]{0.4\textwidth}
-        \includegraphics[width=\textwidth]{conBNec}
-        \caption{Optimal solution obtained by X1. The $y$-variables inducing the resulting tree in this model represent undirected edges. The objective value of this tree is 25156.}
-        \label{fig:BorigSMT}
-    \end{subfigure}
-    \hfill
-% a blank line to force the subfigure onto a new line
-    \begin{subfigure}[b]{0.4\textwidth}
-        \includegraphics[width=\textwidth]{conBNec2}
-        \caption{Solution obtained by F1 without constraint \ref{con:pf1:B} with objective value 25148.
-		 The nodes are connected by arrows because the tree yielded by this model is rooted in a predefined source $s_0$.}
-        \label{fig:Bpf2}
-    \end{subfigure}
-    \caption{An exemplary instance showing why constraint (\ref{con:pf1:B}) is necessary in F1.
-		Blue numbers denote power requuirements of connection between nodes.
-		For better legibility, the distances of the links are not proportional.} 
-    \label{fig:BProof}
-\end{figure}
-By (\ref{con:pf1:B}) we prevent a non-destination from having multiple entering arcs.
-This is not necessary in the minimum Steiner tree problem formulation, because the objective function causes that such solutions are filtered out by optimality.
-The necessity of this constraint in SMT is demonstrated in Fig. \ref{fig:BProof}.
-%The optimal solution with objective value 25156 to the depicted instance obtained by solving SMT-X1 is shown in Fig. \ref{fig:BorigSMT}.
-%The solution in Fig \ref{fig:Bpf2} yielded by solving SMT-F1 without the constraint (\ref{con:pf1:B}) has objective value 25148, but is not a feasible solution to Problem \ref{def:problem}, because of the cycle $(g,h,i,d,g)$.
-%The non-existence of such a cycle in a solution given by model X1 is ensured by constraints (\ref{con:dd:arrowFromDest}), (\ref{con:dd:arrowFromNonDestB}) and (\ref{con:dd:oneDir}).
-%A detailed proof of this claim can be found in \cite{ivanova16isco}.
-%A transmission commenced in node $c$ is sent via arc $(g,f)$.
-%As a consequence of the link between $g$ and $d$ in Fig. \ref{fig:Bpf2}, the node $d$ also receives the message.
-%This link is absent in Fig. \ref{fig:BorigSMT}, and so $i$ has to relay the signal using arc $(i,d)$, causing the higher total objective value.
-Similarly, the obviously valid inequalities (\ref{con:pf1:noflowFromT})-(\ref{con:pf1:fitt=xit}) are not necessary in the minimum Steiner tree formulation, but have to be included in the formulation of SMT, because they  disallow nodes in $D_0$ to have multiple entering arcs.
-The same restriction has to be imposed on $s_0$ by including (\ref{con:pf1:xi0=0}).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                     %
-%         Proposition 1               %
-%                                     %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{prop}
-\label{prop:modelcorrect}
-If $(F,g)$ satisfies (\ref{con:pf1:xfrel}) - (\ref{con:pf1:dim}) and (\ref{con:pf1:B})-(\ref{con:pf1:xi0=0}) then $G_{g}$ is an arborescence spanning $D$ rooted at $s_0$.
-\end{prop}
- 
-\begin{proof}
-The connectivity of $G_{x}$ as well as coverage of all nodes from $D$ is ensured by flow constraints (\ref{con:pf1:flow}) and relation (\ref{con:pf1:xfrel}).
-The absence of both directed and undirected cycles is enforced by (\ref{con:pf1:B})-(\ref{con:pf1:xi0=0}).
-These constraints together imply that no node has more than one entering arc.
-In particular for a destination $i\in D_0$, by utilizing first (\ref{con:pf1:fitt=xit}), next (\ref{con:pf1:flow}) for $t=i$, and finally (\ref{con:pf1:noflowFromT}), we get
-$$\sum_{j\in V_i}g_{ji}=\sum_{j\in V_i}F_{ji}^i = 1+\sum_{j\in V_i}F_{ij}^i=1.$$
-%Solutions, where nodes from $V\setminus D$ are leaves are excluded due to (\ref{con:pf1:flowX}).
-\qed
-\end{proof}
+\begin{cor}
+F1 is a correct formulation of Problem \ref{def:problem}.
+\end{cor}
 
 \subsubsection{Valid inequalities [F2]}
 
@@ -390,34 +394,35 @@ introduced in \cite{Polzin}, which is also analogous to (\ref{con:dd:extraCon}).
 
 \subsubsection{Double flow extension [F3]}
 
-Similarly to the extension X3 of X2 by $f$-variables, the model F2 can also be extended by variables with four node indices.
+Similarly to the extension X3 of X2 by $x$-variables, the model F2 can also be extended by variables with four node indices.
 Analogously to $S$, let $\check{S}=\{\{s,t\}\subseteq D: s\neq t\}$ be the set of unordered pairs of destinations, and let $\check{S}_0=\{\{s,t\}\in S: s\neq s_0\neq t\}$.
  
 The authors of \cite{Polzin} use variables
 \newline\newline
 $f^{st}_{ij}=
 \begin{cases}
-    1 & \text{if arc $(i,j) \in A$ carries flow from $s_0$ to both $s$ and $t$, $\{s,t\}\in \check{S}_0$},\\
+    1 & \text{if arc $(i,j) \in A$ lies on a path  from $s_0$ to both $s$ and $t$, $\{s,t\}\in \check{S}_0$},\\
     0 & \text{otherwise},
 \end{cases}$
 \newline\newline
-describing a common flow from $s_0$ to $s$ and $t$.
-It is now possible to express variables $x^{st}_{ij}$ from $X2$ in the F3 space as 
-
-\begin{align}
-\label{eq:tr:fstij1}
-\begin{aligned}
-x^{st}_{ij}&=F^t_{ij}(1-f^{st}_{ij})+F^{s}_{ji}(1-f^{st}_{ji})= \\
-  	   &=  F^t_{ij}+F^s_{ji} - f^{st}_{ij} - f^{st}_{ji}\\
-x^{0t}_{ij}&=F^t_{ij}\\
-\end{aligned}
-&&
-\begin{aligned}
-\\
-(i,j)\in A, \{s,t\}\in S_0\\
-(i,j)\in A, t\in S_0.
-\end{aligned}
-\end{align}
+which can also be regarded as a describtion of a common flow from $s_0$ to $s$ and $t$.
+%describing a common flow from $s_0$ to $s$ and $t$.
+%It is now possible to express variables $x^{st}_{ij}$ from $X2$ in the F3 space as 
+%
+%\begin{align}
+%\label{eq:tr:fstij1}
+%\begin{aligned}
+%x^{st}_{ij}&=F^t_{ij}(1-f^{st}_{ij})+F^{s}_{ji}(1-f^{st}_{ji})= \\
+%  	   &=  F^t_{ij}+F^s_{ji} - f^{st}_{ij} - f^{st}_{ji}\\
+%x^{0t}_{ij}&=F^t_{ij}\\
+%\end{aligned}
+%&&
+%\begin{aligned}
+%\\
+%(i,j)\in A, \{s,t\}\in S_0\\
+%(i,j)\in A, t\in S_0.
+%\end{aligned}
+%\end{align}
 %
 This allows formulation of an extended model denoted as F3: 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -426,12 +431,12 @@ This allows formulation of an extended model denoted as F3:
 %     (4a) - (4m) and (5b) - (5f)     %
 %                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{subequations}
+\begin{subequations}[resume]
 \begin{align}
-\min & \sum\limits_{(i,j) \in A} \sum\limits_{s \in D} p_{ij} \pi^s_{ij}\\ \notag
+\notag\min & \sum\limits_{(i,j) \in A} \sum\limits_{s \in D} p_{ij} \pi^s_{ij}\\ \notag
 \text{s.t.}& && \\
 %(\ref{con:pf1:xfrel}) - (\ref{con:pf1:flowX}),& \notag \\
-\notag(\ref{con:pf1:flow}) - (\ref{con:pf1:dim}) &\text{ and } (\ref{con:pf1:yvar}) - (\ref{con:pf1:flowX})\\
+\notag(\ref{con:pf1:flow}) &- (\ref{con:pf1:flowX})\\
 \label{con:pf2:flowHook} \sum\limits_{\substack{ j \in V_i }}f^{st}_{ji}-\sum\limits_{\substack{j\in V_i}}f^{st}_{ij} & \geq 
   \begin{cases}
     -1 & \{s,t\}\in \check{S_0}, i = 0, \\
@@ -448,8 +453,44 @@ This allows formulation of an extended model denoted as F3:
 
 By (\ref{con:pf2:flowHook}) is ensured that the common flow is non-increasing.
 The inequalities (\ref{con:pf2:stronger}) replace a weaker (\ref{con:pf1:xfrel}).
-Finally, (\ref{con:pf2:sumFImpSumY}) - (\ref{con:pf2:sumFImpSumY2}) is the valid inequality (\ref{con:vi:sumFImpSumY}) after applying transformation (\ref{eq:tr:fstij1}).
- 
+Finally, (\ref{con:pf2:sumFImpSumY}) - (\ref{con:pf2:sumFImpSumY2}) is a valid inequality (\ref{con:vi:sumFImpSumY}) implied by the following
+
+\begin{prop}\label{prop:transX}
+Assume $(F,f,\pi,g)$ satisfies (\ref{con:pf1:flow}) - (\ref{con:pf2:stronger}). Then
+$$
+F^t_{ij}+F^s_{ji}-f^{st}_{ij}-f^{st}_{ji} = 
+	\begin{cases}
+		1, ~(i,j)~\text{is an arc on the path from~$s$ to $t$ in $G_{g}$} \\
+		0, ~\text{otherwise.}
+	\end{cases}
+$$
+\end{prop}
+%
+\begin{proof}
+
+Let $T=(V_T,E_T)$ be a tree covering $D$, and consider an edge $\{i,j\}\in E_T$ dividing $T$ into two subtrees $T_i$ and $T_j$ rooted in $i$ and $j$, respectively.
+If the arc $(i,j)$ carries flow from $s\in D$ to $t\in D$, then $s$ and $t$ must lie in different subtrees.
+Node $s_0$ lies either in $T_i$ or $T_j$.
+%as depicted in Fig. \ref{fig:transf_a} and Fig. \ref{fig:transf_b}, respectively.
+These two cases are captured by the first equality in (\ref{eq:tr:fstij}).
+If both $s_0$ and $s$ lie in $T_i$, then $f_{ij}^t=1$.
+Similarly, if $s_0$ and $t$ lie in $T_j$, then $f_{ji}^s=1$.
+The expressions in parentheses prevent $s$ and $t$ belonging to the same subtree.
+Using the implications $\check{f^{st}_{ij}}=1\Rightarrow f_{ij}^t=1$ and $\check{f^{st}_{ji}}=1\Rightarrow f_{ji}^s=1$ that follow from the interpretation of variables, we justify the second equality expressing this relation linearly.
+\begin{subequations}
+\begin{align}
+\notag\label{eq:tr:fstij}f^{st}_{ij}&=f^t_{ij}(1-\check{f}^{st}_{ij})+f^{s}_{ji}(1-\check{f}^{st}_{ji})= \\
+  &=  f^t_{ij}+f^s_{ji} - \check{f}^{st}_{ij} - \check{f}^{st}_{ji}& (i,j)\in A, \{s,t\}\in S_0\\
+\notag\label{eq:tr:xijj}x^s_{ij}&=x_{ij}(1-f^{s}_{ij})(1-f^{s}_{ji})+x_{ji}f^{s}_{ji}=\\
+  &= x_{ij}-f^s_{ij} + f^{s}_{ji} & (i,j)\in A, s\in D_0\\
+\label{eq:tr:zij}z_{ij}&=x_{ij}+x_{ji}& \{i,j\}\in E
+\end{align}
+\end{subequations}
+\qed
+\end{proof}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Additional VI following from implicit symmetry 5  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %It follows from the domain of $f$, that 
 %\begin{equation}
 %\label{eq:fhooksym}f_{ij}^{st}=f_{ij}^{ts},
