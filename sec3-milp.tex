@@ -32,7 +32,7 @@ The following constraints imply that $G_y$ is a Steiner tree spanning $D$.
 The minimum Steiner tree is formulated as
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                     % 
-%     STEINER TREE MODEL $\mathcal{X}_0$           %
+%     STEINER TREE MODEL  X0          %
 %                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{subequations}\label{mod:x0}
@@ -46,7 +46,7 @@ The minimum Steiner tree is formulated as
 \end{align}~
 \end{subequations}
 
-Let $(X,y)$ be an optimal solution to $\mathcal{X}_0$.
+Let $(X,y)$ be an optimal solution to $\mathcal{X}_0$. 
 Then for each $s\in D$, $X^s\in \{0,1\}^{A}$ induces a Steiner arborescence $G_{X^s}$ rooted at source $s$.
 From $y\in \{0,1\}^E$ we obtain the resulting (undirected) Steiner tree $G_{y}$ modeled by (\ref{con:dd:arrowFromDest})-(\ref{con:dd:startInSource}).
 Constraint (\ref{con:dd:arrowFromDest}) ensures that there is exactly one predecessor $j\in V$ of a destination $i\in D$ in $G_{X^s}$.
@@ -77,7 +77,7 @@ leading to the following formulation $\mathcal{X}_1$ of SMT:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                     % 
-%             MODEL $\mathcal{X}_1$                %
+%             MODEL X1                %
 %           (3 idx vars)              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{subequations}[resume]\label{eq:smt-x2}
@@ -101,7 +101,7 @@ The graph induced by $\pi^s$ is  a subgraph of the tree induced by $X^s$, and is
 It is possible to strengthen $\mathcal{X}_1$ by adding valid inequalities
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                     % 
-%             MODEL $\mathcal{X}_2$                %
+%             MODEL X2                %
 %      (3 idx vars + VIs )            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{subequations}[resume]
@@ -138,10 +138,10 @@ Model $\mathcal{X}_2$ can be strengthened by constraints concerning the newly in
 \newline
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                     % 
-%             MODEL $\mathcal{X}_3$                %
+%             MODEL X3                %
 %             (4 idx vars)            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{subequations}[resume]\label{eq:smt-x2}
+\begin{subequations}[resume]\label{eq:smt-x3}
 \begin{align}
 \notag\makebox[0pt][l]{$\displaystyle{} \min \sum\limits_{(i,j) \in A} \sum\limits_{s \in D} p_{ij} \pi^s_{ij} $}\\
 \text{s.t.} \notag \\
@@ -196,7 +196,7 @@ The model $\mathcal{F}_0$ of a Steiner tree contains variables
 and is formulated as
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                     % 
-%     STEINER ARBORESCENCE $\mathcal{F}_0$         %
+%     STEINER ARBORESCENCE F0         %
 %        (from Polzin)                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{subequations}
@@ -234,7 +234,7 @@ The $\pi$-variables from $\mathcal{X}_1$ have to be used in $\mathcal{F}_1$, bec
 The model $\mathcal{F}_1$ for Problem \ref{def:problem} based on the minimum Steiner arborescence model $\mathcal{F}_0$ is constructed as follows: 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                     % 
-%             MODEL $\mathcal{F}_1$                %
+%             MODEL F1                %
 %        (3 idx vars)                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{subequations}[resume]
@@ -297,7 +297,7 @@ The same restriction has to be imposed on $s_0$ by including (\ref{con:pf1:xi0=0
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                     %
 %         Proposition  		      %
-% ($\mathcal{F}_1$ models an arborescence) %
+% (F1 models an arborescence)         %
 %                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{prop}
@@ -322,7 +322,7 @@ $$\sum_{j\in V_i}g_{ji}=\sum_{j\in V_i}F_{ji}^i = 1+\sum_{j\in V_i}F_{ij}^i=1.$$
 %   (transformation X_{ij}^s)         %
 %                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{prop}\label{prop:transX}
+\begin{prop}\label{prop:transx}
 Assume $(F,\pi,g)$ satisfies (\ref{con:pf1:xfrel}) - (\ref{con:pf1:dim}) and  (\ref{con:pf1:B}) - (\ref{con:pf1:dimy}). Then
 $$
 g_{ij} - F^t_{ij}+F^t_{ji} = 
@@ -357,7 +357,7 @@ The $x$-variable in (\ref{con:vi:sumYImpSumX}) has to be replaced by the equival
 Subsequent application of flow conservation (\ref{con:pf1:flow}) yields
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                     %
-%             MODEL $\mathcal{F}_2$                %
+%             MODEL F2                %
 %                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{subequations}[resume]
@@ -411,7 +411,7 @@ which can also be regarded as a description of a common flow from $s_0$ to $s$ a
 This allows formulation of an extended model denoted as $\mathcal{F}_3$: 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                     %
-%             MODEL $\mathcal{F}_3$   %
+%             MODEL F3                %
 %                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{subequations}[resume]
