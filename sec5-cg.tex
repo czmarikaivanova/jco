@@ -8,14 +8,19 @@ This approach is known as a \emph{constraint generation scheme}.
 
 \subsection{Implementation}%
 
+According to experimental results presented in the next section, there is a trade-off between runtime and strength of the studied models.
+LP relaxations of models $\mathcal{F}$ are stronger but slower than their counterparts $\mathcal{X}$.
+The disproportion in runtime is most considerable in $\mathcal{F}_3$ and $\mathcal{X}_3$ whose strength is achieved because of the valid inequality (\ref{con:vi:sumFImpSumY}). 
 %Experimental evaluation from the next section reveals that the valid inequality (\ref{con:vi:sumFImpSumY}) makes $\mathcal{X}_3$ very strong, in fact its LP relaxation often gives an integral solution.
 %To the contrary, the other valid inequalities (\ref{con:vi:f2dest}) and (\ref{con:vi:xImpSumF}) rarely improve the LP bounds, and moreover increase the runtime.
-For these practical reasons, we consider the model X2+(\ref{con:vi:sumFImpSumY}) for constraint generation.
+For these practical reasons, we consider the model $\mathcal{X}_3$ for constraint generation.
 Also note that LP($\mathcal{X}_1$) has the shortest runtime but not much shorter than LP($\mathcal{X}_2$).
 The idea is therefore to solve LP($\mathcal{X}_2$) and generate only those remaining constraints that are violated.
 
-For each $(s,t)\in S$, constraints (\ref{con:mf:flowNormal})-(\ref{con:mf:fcap})form a classical maximum flow formulation which can be solved very quickly.
-Observe that according to (\ref{con:mf:fcap}), $x^s$ plays the role of a capacity vector in the network $G_{x^s}=(V,E,s,t,x^s)$ in which we want to find the maximum flow, and thereby verify whether the flow conservation constraints are already satisfied even though they are not explicitly included in the model.
+%For each $(s,t)\in S$, constraints (\ref{con:mf:flowNormal})-(\ref{con:mf:fcap})form a classical maximum flow formulation which can be solved very quickly.
+Consider $X$ fixed.
+Whether there exists an $f\in\left[0,1\right]^{A\times S}$ satisfying (\ref{con:mf:flowNormal})-(\ref{con:mf:fcap}) can be checked by solving a maximum flow problem for each $(s,t)\in S$.
+Observe that according to (\ref{con:mf:fcap}), $X^s$ plays the role of a capacity vector in the network $G_{X^s}=(V,E,s,t,X^s)$ in which we want to find the maximum flow, and thereby verify whether the flow conservation constraints are already satisfied even though they are not explicitly included in the model.
 The formulation can also be extended by (\ref{con:vi:sumFImpSumY}).
 Unfortunately, including (\ref{con:mf:fsym}) is slightly problematic here, because it contains variables of a different commodity, namely $(t,s)$.
 It is not possible to simply extend the model by these constraints, because a potential violation of flow conservation for the commodity $(t,s)$ would not be discovered, as there are no corresponding capacity constraints.
